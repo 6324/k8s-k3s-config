@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-canary
+  namespace: spring-cloud
+  labels:
+    app: nginx-deployment-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # 跟template.metadata.labels一致
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        track: canary
+    spec:
+      containers:
+        - name: new-nginx
+          image: daocloud.io/library/nginx:1.10
+          ports:
+            - containerPort: 80
