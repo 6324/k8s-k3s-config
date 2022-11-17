@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: demoConfigMap
+  namespace: default
+data:
+  key: default
+  ip: 10.10.10.10
+  port: 8080
+  url: /api/taobao
+  
