@@ -1,0 +1,76 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-demo
+  namespace: spring-cloud
+  labels:
+    app: mysql-demo
+spec:
+  selector:
+    matchLabels:
+      app: mysql-demo
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mysql-demo
+    spec:
+      # initContainers:
+        # Init containers are exactly like regular containers, except:
+          # - Init containers always run to completion.
+          # - Each init container must complete successfully before the next one starts.
+      containers:
+      - name: mysql-demo
+        image: mysql
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 1000Mi
+          limits:
+            cpu: 100m
+            memory: 1000Mi
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        ports:
+        - containerPort: 3306
+          name: mysql-demo
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: data-path
+          mountPath: /var/lib/mysql
+
+      volumes:
+        - name: data-path
+          hostPath:
+            path: /home/demo-mysql/data
+            type: DirectoryOrCreate
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+      restartPolicy: Always
+---
