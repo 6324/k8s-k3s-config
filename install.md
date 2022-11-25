@@ -55,7 +55,29 @@ sudo systemctl start docker
 ```
 curl -sfL https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn  K3S_TOKEN=fuckfuck sh -s - --docker	
 ```
+### 查看K3S token
+```
+cat /var/lib/rancher/k3s/server/token
+```
 ## 安装Agent节点
 ```
 curl -sfL https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_TOKEN=K102884562888a23fc7064420d1685fa3cd6ec6f253dd6ef003729c940fe6c64309::server:fuckfuckfuck K3S_URL=https://192.168.100.201:6443 sh -s - --docker
+```
+
+### 安装helm
+
+官网: https://helm.sh/zh/docs
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+### 添加helm仓库
+
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+### 使用helm安装应用
+```
+helm install bitnami/mysql --generate-name
 ```

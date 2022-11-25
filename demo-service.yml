@@ -1,0 +1,17 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: bordservice
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    app: kubernetes-dashboard
+  type: NodePort
+  ports:
+  - name: bordservice
+    protocol: TCP
+    port: 8001
+    targetPort: 8001
+    nodePort: 30001
+---
