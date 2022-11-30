@@ -127,3 +127,8 @@ cat /etc/hosts
 ```
 kubectl exec -it test-7d7c9775c5-pp9mm -c nginx  -- bash
 ```
+
+### k3s kubeconfig文件
+```
+/etc/rancher/k3s/k3s.yaml
+```
