@@ -132,3 +132,57 @@ kubectl exec -it test-7d7c9775c5-pp9mm -c nginx  -- bash
 ```
 /etc/rancher/k3s/k3s.yaml
 ```
+### 查看docker已登录信息
+```
+cat /root/.docker/config.json
+```
+
+### k8s创建secret
+
+```
+ kubectl create secret docker-registry xxx-harbor     --docker-server=https://docker-new.xxx.cn/     --docker-username='xxxxxxxxx'     --docker-password='xxxxxxxxxxxxx'
+```
+
+#### 私服创建pod
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "k8sserver"
+  namespace: default
+  labels:
+    app: "k8sserver"
+spec:
+  containers:
+  - name: k8sserver
+    image: "docker-xxxx.cn/pim/k8s-server:1.0"
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+    ports:
+    - containerPort: 8888
+      name: http
+  imagePullSecrets:
+    - name: xxx-harbor
+  restartPolicy: Always
+```
+
+## 生态
+
+|  项目   | 类型  | 简介
+|  ----  | ----  | ----
+| [minikube](https://minikube.sigs.k8s.io/docs/)  | 官方 | k8s官方项目，用于单机学习模拟k8s |
+| [Kubernetes DashBoard](https://github.com/kubernetes/dashboard)  | 官方 | kubernetes官方面板 |
+| [Rancher](https://docs.ranchermanager.rancher.io/zh/)  | 官方 | k3s的爸爸 以前做k8s周边相关服务 可以从rancher安装并管理k8s |
+| [k3s](https://docs.rancher.cn/docs/k3s/_index/)  | 官方 | k3s |
+| [AutoK3s](https://docs.rancher.cn/docs/k3s/autok3s/_index)  | 官方 | 安装k3s集群脚手架 |
+| [Kuboard](https://kuboard.cn/)  | 开源 | kubernetes开源面板 功能丰富 |
+| [kuboard-spray](https://github.com/eip-work/kuboard-spray)  | 开源 | 基于 kubespray 提供图形化的 K8S 集群离线安装、维护工具。跟Kuboard一个作者 |
+| [KubeSphere](https://kubesphere.io/zh/)  | 开源 | kubernetes开源面板 专注流程化 |
+| [kubespray](https://github.com/kubernetes-sigs/kubespray)  | 开源 | 安装k8s的脚手架 |
+| [kubeasz](https://github.com/easzlab/kubeasz)  | 开源 |安装k8s的脚手架 |
+
