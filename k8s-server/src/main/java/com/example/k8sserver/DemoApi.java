@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -31,17 +34,20 @@ public class DemoApi {
 
 
     static volatile boolean startWhile = true;
+    static List<Thread> threadList = new ArrayList<>();
 
     @GetMapping("/up-cpu")
     public String upCpu(@RequestParam(defaultValue = "1") int tag) {
         startWhile = true;
         for (int i = 0; i < tag; i++) {
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
                 while (startWhile) {
-                    double v = rand_pi(RandomUtil.randomInt(500, 1000));
-                    System.out.println(Thread.currentThread().getName() + " " + v);
+//                    double v = rand_pi(RandomUtil.randomInt(10, 100));
+//                    System.out.println(Thread.currentThread().getName() + " " + v);
                 }
-            }, RandomUtil.randomString(5)).start();
+            }, RandomUtil.randomString(5));
+            threadList.add(thread);
+            thread.start();
         }
         return "ok";
     }
@@ -49,6 +55,13 @@ public class DemoApi {
     @GetMapping("/down-cpu")
     public String downCpu() {
         startWhile = false;
+        Iterator<Thread> iterator = threadList.iterator();
+        while (iterator.hasNext()){
+            Thread thread = iterator.next();
+            thread.interrupt();
+            System.out.println(thread.getName() + " 停止");
+            iterator.remove();
+        }
         return "ok";
     }
 
