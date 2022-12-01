@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+
+
 ## 环境准备
 
 ### 关闭防火墙
@@ -47,6 +57,10 @@ curl -sSL https://get.daocloud.io/docker | sh
 curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 ```
 
+# 问题1. IDC厂商如何动态扩缩容服务器并规划hostname以及ip？
+- pxe+kickstart 
+- ansible
+
 ### docker镜像加速 (containerd跳过)
 ``` 
 sudo mkdir -p /etc/docker
@@ -60,16 +74,6 @@ sudo systemctl restart docker
 ```
 
 
-### containerd镜像加速
-每个节点新增配置
-```
-vi /etc/rancher/k3s/registries.yaml
-
-mirrors:
-  docker.io:
-    endpoint:
-      - "https://on03swcr.mirror.aliyuncs.com/"
-```
 
  
 
@@ -91,19 +95,100 @@ curl -sfL https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh 
 curl -sfL https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_TOKEN=ABCDEFG K3S_URL=https://192.168.114.200:6443 sh -s - --docker
 
 ```
-## Docker和Container关系
-## 一个pod多个容器
-## nginx示例
-### 集群 
-## 金丝雀发布示例
-### nginx为例 replicas
 
+### containerd镜像加速
+每个节点新增配置
+```
+vi /etc/rancher/k3s/registries.yaml
+
+mirrors:
+  docker.io:
+    endpoint:
+      - "https://on03swcr.mirror.aliyuncs.com/"
+```
+
+
+
+### 简单创建pod
+```
+kubectl run mynginx --image=nginx
+```
+### 命名空间
+
+### 常用命令
+```
+kubectl get pod ...
+kubectl get pod ... -owide
+kubectl get pod ... -owide --watch
+kubectl get service ...
+kubectl get deploy ...
+kubectl get rs ...
+kubectl get all
+kubectl describe pod xxx
+kubectl logs xxx -n=xxx
+kubectl exex -it xxx -- bash
+kubectl delete xxx 
+kubectl delete xxx --force
+...
+
+```
+
+### 部署副本集(Deployment Replicaset) 
+```
+kubectl create deployment nginx-d1m --image=nginx:1.15 --replicas=3
+```
+### 手动缩放 （场景）
+```
+kubectl scale deployment/nginx-d1m --replicas=5
+```
+### 自动缩放 （场景）
+```
+kubectl autoscale deployment/nginx-d1m --min=3 --max=10 --cpu-percent=90
+
+```
+### 滚动更新
+```
+kubectl set image deployment/nginx-d1m nginx=nginx:1.17
+
+kubectl rollout status deployment/nginx-d1m
+
+```
+### 历史版本
+```
+kubectl rollout history deployment/nginx-d1m
+```
+### 查看具体版本信息
+```
+kubectl rollout history deployment/nginx-d1m --revision=2
+```
+### 回滚到某个版本
+```
+kubectl rollout history deployment/nginx-d1m --revision=2
+```
+
+## Docker和Container关系
+```
+Kubelet->CRI->[docker-shim->Docker->]Containerd->runc->container
+
+crictl k8s中CRI的交互客户端
+ctr containerd 自带命令行工具
+[详细用法](https://blog.csdn.net/u010157986/article/details/126118897)
+```
+
+### Service
+
+
+
+## 一个pod可以多个容器 共享IP
+## 金丝雀发布示例
 ## 生产环境最佳实践 spring cloud示例
 ### 网关 限流 rpc 服务发现 grafana 普罗米修斯
 
+## 术语
+- control-plane 控制平面（包含apiserver、scheduler、controller-manager...）
+- kubelet 节点控制器 用来操作容器
 
 ### 安装helm
-
 官网: https://helm.sh/zh/docs
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
