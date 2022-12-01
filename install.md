@@ -40,14 +40,14 @@ hostnamectl set-hostname k3s-master
 ```
 
 
-### 安装docker(国内)
+### 安装docker (containerd跳过)
 ```
 curl -sSL https://get.daocloud.io/docker | sh
 或
 curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 ```
 
-### docker镜像加速
+### docker镜像加速 (containerd跳过)
 ``` 
 sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json <<-'EOF'
@@ -59,10 +59,19 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
-### 重启docker
+
+### containerd镜像加速
+每个节点新增配置
 ```
-sudo systemctl start docker
+vi /etc/rancher/k3s/registries.yaml
+
+mirrors:
+  docker.io:
+    endpoint:
+      - "https://on03swcr.mirror.aliyuncs.com/"
 ```
+
+ 
 
 ## 安装Master节点
 ### 安装server时指定容器为docker、指定token (国内)
@@ -83,9 +92,6 @@ curl -sfL https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh 
 
 ```
 ## Docker和Container关系
-## 有状态和无状态
-## CoreDNS
-## ingress 路由
 ## 一个pod多个容器
 ## nginx示例
 ### 集群 
@@ -185,4 +191,19 @@ spec:
 | [KubeSphere](https://kubesphere.io/zh/)  | 开源 | kubernetes开源面板 专注流程化 |
 | [kubespray](https://github.com/kubernetes-sigs/kubespray)  | 开源 | 安装k8s的脚手架 |
 | [kubeasz](https://github.com/easzlab/kubeasz)  | 开源 |安装k8s的脚手架 |
+| [rainbond](https://www.rainbond.com/docs/)  | 开源 |云原生应用管理平台 |
+| [Helm](https://helm.sh/zh/)  | 开源 |k8s下的包管理器 |
 
+
+## 服务生态
+
+|  项目   | 类型  | 简介
+|  ----  | ----  | ----
+| [istio]( )  | 服务网格 |  稳定的服务网格 路由 灰度 流量分发 |
+| [linkerd](https://github.com/linkerd/linkerd2)  | 服务网格 | 轻量级的服务器网格 比较新  |
+| [etcd](https://github.com/etcd-io/etcd)  | 存储 | 类Redis的轻量级分布式键值对数据库 |
+| [CoreDNS](https://github.com/etcd-io/etcd)  | 服务发现 | 配合service解决pod pi频繁变动的问题 |
+| [traefik](https://github.com/traefik/traefik)  | 反向代理 | 配合service解决pod pi频繁变动的问题 |
+| [metrics-server](https://github.com/traefik/traefik)  | 监控 |  |
+| [ingress]()  |   |  |
+ 
